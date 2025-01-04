@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DogType | Program AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h1>Selamat Datang di DogType</h1>
+    </div>
+    <!-- NAVBAR SELESAI -->
+
+    <!--CONTENT -->
+    <div class="content">
+        <h1>Upload Image</h1>
+        <form>
+            <div class="form-group">
+                <label for="imageUpload">Select Image</label> <br>
+                <input type="file" accept="image/*" id="imageUpload" />
+            </div>
+            <div class="form-group">
+                <img id="previewImage" src="" alt="Preview Gambar"
+                    style="max-width: 100%; height: auto; display: none; margin-top: 10px;" />
+            </div>
+            <div class="form-group">
+                <label for="textbox">Apakah anda ingin mengetahui jenis anjing anda?</label><br>
+                <input type="text" id="textbox" placeholder="The result will be here" readonly />
+            </div>
+            <div class="form-group">
+                <button type="button" id="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <!-- CONTENT 1 SELESAI -->
+
+    <!-- FOOTER -->
+    <div>
+        <footer>
+            <p>&copy; DogType Semua Hak Dilindungi</p>
+        </footer>
+    </div>
+    <!-- FOOTER SELESAI -->
+
+    <script>
+        async function run() {
+            const model = await tf.loadLayersModel('./model/model.json');
+
+            document.getElementById('imageUpload').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const previewImage = document.getElementById('previewImage');
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('submit').addEventListener('click', async function () {
+                const fileInput = document.getElementById('imageUpload').files[0];
+
+                if (!fileInput) {
+                    alert('Please select an image.');
+                    return;
+                }
+                document.getElementById('textbox').value = 'Processing...';
+
+
+                const reader = new FileReader();
+                reader.onload = async function (event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+
+                    img.onload = async () => {
+                        const imageTensor = tf.browser.fromPixels(img)
+                            .resizeNearestNeighbor([224, 224])
+                            .expandDims(0)
+                            .div(255.0);
+
+                        const predictions = model.predict(imageTensor);
+                        const result = await predictions.array();
+                        const classIndex = result[0].indexOf(Math.max(...result[0]));
+                        const confidence = Math.max(...result[0]);
+                        const classLabels = ['Beagle', 'Boxer', 'Bulldog', 'Dachshund', 'German Shepherd', 'Labrador Retriever', 'Poodle', 'Rottweiler', 'Yorkshire Terrier']; // Adjust based on your dataset
+                        const predictedClass = classLabels[classIndex] || 'Unknown';
+                        document.getElementById('textbox').value = `${predictedClass} (Confidence: ${(confidence * 100).toFixed(2)}%)`;
+                    };
+                };
+
+                reader.readAsDataURL(fileInput);
+            });
+        }
+        run();
+    </script>
+</body>
+
+</html>
