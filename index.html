@@ -91,7 +91,7 @@
                         const result = await predictions.array();
                         const classIndex = result[0].indexOf(Math.max(...result[0]));
                         const confidence = Math.max(...result[0]);
-                        const classLabels = ['Beagle', 'Boxer', 'Bulldog', 'Dachshund', 'German Shepherd', 'Labrador Retriever', 'Rottweiler', 'Poodle', 'Yorkshire Terrier']; 
+                        const classLabels = ['Beagle', 'Boxer', 'Bulldog', 'Dachshund', 'German Shepherd', 'Labrador Retriever', 'Yorkshire Terrier', 'Poodle', 'Rottweiler']; 
                         const predictedClass = classLabels[classIndex] || 'Unknown';
                         document.getElementById('textbox').value = `${predictedClass} (Confidence: ${(confidence * 100).toFixed(2)}%)`;
                     };
