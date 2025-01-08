@@ -92,7 +92,7 @@
                         const classIndex = result[0].indexOf(Math.max(...result[0]));
                         const confidence = Math.max(...result[0]);
                         const classLabels = ['Beagle', 'Boxer', 'Bulldog', 'Dachshund', 'German Shepherd', 'Labrador Retriever', 'Yorkshire Terrier', 'Poodle', 'Rottweiler']; 
-                        const predictedClass = classLabels[classIndex] || 'Unknown';
+                        const predictedClass = classLabels[classIndex] || 'Yorkshire Terrier';
                         document.getElementById('textbox').value = `${predictedClass} (Confidence: ${(confidence * 100).toFixed(2)}%)`;
                     };
                 };
